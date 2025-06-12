@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Forum IAS Current Affairs</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    h1 { text-align: center; }
+    ul { list-style-type: none; padding-left: 0; }
+    li { margin-bottom: 12px; }
+    a { text-decoration: none; color: #0073e6; font-weight: bold; }
+    a:hover { text-decoration: underline; }
+    .empty { color: #666; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>📰 Forum IAS - Current Affairs</h1>
+  <ul id="forumias-news"></ul>
+
+  <script>
+    const feedUrl = "https://forumias.com/feed/";
+
+    function fetchFeed() {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('forumias-news');
+          container.innerHTML = '';
+
+          if (!data.items || data.items.length === 0) {
+            container.innerHTML = '<li class="empty">No news available.</li>';
+            return;
+          }
+
+          data.items.slice(0, 15).forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
+            container.appendChild(li);
+          });
+        })
+        .catch(error => {
+          document.getElementById('forumias-news').innerHTML = `<li class="empty">Error: ${error.message}</li>`;
+        });
+    }
+
+    fetchFeed();
+    // Refresh every 10 minutes
+    setInterval(fetchFeed, 10 * 60 * 1000);
+  </script>
+</body>
+</html>

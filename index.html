@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Auto-Updated UPSC News</title>
+  <title>UPSC News – Next IAS & AffairsCloud</title>
   <style>
-    body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-    h1 { text-align: center; }
+    body { font-family: sans-serif; background: #f9f9f9; padding: 20px; }
+    h1 { text-align: center; color: #222; }
+    h2 { margin-top: 30px; border-bottom: 2px solid #ddd; padding-bottom: 5px; color: #333; }
     section { margin-bottom: 40px; }
-    h2 { margin-top: 30px; color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
     ul { list-style: none; padding-left: 0; }
     li { margin: 10px 0; }
     a { color: #0056b3; text-decoration: none; font-weight: bold; }
@@ -16,7 +16,7 @@
   </style>
 </head>
 <body>
-  <h1>📰 UPSC Current Affairs </h1>
+  <h1>📰 UPSC News: Next IAS & AffairsCloud</h1>
 
   <section>
     <h2>Next IAS</h2>
@@ -28,37 +28,28 @@
     <ul id="affairscloud"></ul>
   </section>
 
-  <section>
-    <h2>ExamsDaily</h2>
-    <ul id="examsdaily"></ul>
-  </section>
-
-  <section>
-    <h2>UPSC from Home</h2>
-    <ul id="upscfromhome"></ul>
-  </section>
-
   <script>
     const feeds = {
       nextias: 'https://www.nextias.com/blog/feed',
-      affairscloud: 'https://affairscloud.com/feed/',
-      examsdaily: 'https://examsdaily.in/feed',
-      upscfromhome: 'https://upscfromhome.com/feed'
+      affairscloud: 'https://affairscloud.com/feed/'
     };
 
     function fetchFeed(rssUrl, containerId) {
       const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
       fetch(apiUrl)
         .then(res => res.json())
         .then(data => {
           const container = document.getElementById(containerId);
           container.innerHTML = '';
+
           if (!data.items || data.items.length === 0) {
             container.innerHTML = '<li class="empty">No news available.</li>';
             return;
           }
 
-          data.items.slice(0, 5).forEach(item => {
+          // Show all available items (not just 5)
+          data.items.forEach(item => {
             const li = document.createElement('li');
             li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
             container.appendChild(li);
@@ -69,18 +60,16 @@
         });
     }
 
-    function loadAllFeeds() {
+    function loadFeeds() {
       fetchFeed(feeds.nextias, 'nextias');
       fetchFeed(feeds.affairscloud, 'affairscloud');
-      fetchFeed(feeds.examsdaily, 'examsdaily');
-      fetchFeed(feeds.upscfromhome, 'upscfromhome');
     }
 
     // Initial load
-    loadAllFeeds();
+    loadFeeds();
 
     // Auto-refresh every 10 minutes
-    setInterval(loadAllFeeds, 10 * 60 * 1000);
+    setInterval(loadFeeds, 10 * 60 * 1000);
   </script>
 </body>
 </html>

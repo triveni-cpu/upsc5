@@ -2,52 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Forum IAS Current Affairs</title>
+  <title>Auto-Updated UPSC News</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
     h1 { text-align: center; }
-    ul { list-style-type: none; padding-left: 0; }
-    li { margin-bottom: 12px; }
-    a { text-decoration: none; color: #0073e6; font-weight: bold; }
+    section { margin-bottom: 40px; }
+    h2 { margin-top: 30px; color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+    ul { list-style: none; padding-left: 0; }
+    li { margin: 10px 0; }
+    a { color: #0056b3; text-decoration: none; font-weight: bold; }
     a:hover { text-decoration: underline; }
-    .empty { color: #666; font-style: italic; }
+    .empty { font-style: italic; color: #888; }
   </style>
 </head>
 <body>
-  <h1>📰 Forum IAS - Current Affairs</h1>
-  <ul id="forumias-news"></ul>
+  <h1>📰 UPSC Current Affairs Aggregator</h1>
+
+  <section>
+    <h2>Next IAS</h2>
+    <ul id="nextias"></ul>
+  </section>
+
+  <section>
+    <h2>AffairsCloud</h2>
+    <ul id="affairscloud"></ul>
+  </section>
+
+  <section>
+    <h2>ExamsDaily</h2>
+    <ul id="examsdaily"></ul>
+  </section>
+
+  <section>
+    <h2>UPSC from Home</h2>
+    <ul id="upscfromhome"></ul>
+  </section>
 
   <script>
-    const feedUrl = "https://forumias.com/feed/";
+    const feeds = {
+      nextias: 'https://www.nextias.com/blog/feed',
+      affairscloud: 'https://affairscloud.com/feed/',
+      examsdaily: 'https://examsdaily.in/feed',
+      upscfromhome: 'https://upscfromhome.com/feed'
+    };
 
-    function fetchFeed() {
-      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
-
+    function fetchFeed(rssUrl, containerId) {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
       fetch(apiUrl)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-          const container = document.getElementById('forumias-news');
+          const container = document.getElementById(containerId);
           container.innerHTML = '';
-
           if (!data.items || data.items.length === 0) {
             container.innerHTML = '<li class="empty">No news available.</li>';
             return;
           }
 
-          data.items.slice(0, 15).forEach(item => {
+          data.items.slice(0, 5).forEach(item => {
             const li = document.createElement('li');
             li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
             container.appendChild(li);
           });
         })
-        .catch(error => {
-          document.getElementById('forumias-news').innerHTML = `<li class="empty">Error: ${error.message}</li>`;
+        .catch(err => {
+          document.getElementById(containerId).innerHTML = `<li class="empty">Error: ${err.message}</li>`;
         });
     }
 
-    fetchFeed();
-    // Refresh every 10 minutes
-    setInterval(fetchFeed, 10 * 60 * 1000);
+    function loadAllFeeds() {
+      fetchFeed(feeds.nextias, 'nextias');
+      fetchFeed(feeds.affairscloud, 'affairscloud');
+      fetchFeed(feeds.examsdaily, 'examsdaily');
+      fetchFeed(feeds.upscfromhome, 'upscfromhome');
+    }
+
+    // Initial load
+    loadAllFeeds();
+
+    // Auto-refresh every 10 minutes
+    setInterval(loadAllFeeds, 10 * 60 * 1000);
   </script>
 </body>
 </html>
